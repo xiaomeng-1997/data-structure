@@ -24,3 +24,5 @@ hs_err_pid*
 
 # 编译包
 .out/
+
+.idea/
