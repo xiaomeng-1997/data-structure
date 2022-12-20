@@ -5,19 +5,21 @@ package com.study.stack;
  */
 public class Calculate {
     public static void main(String[] args) {
-        String expression = "3+7+2*6-2";
+        String expression = "30+7+2*6-2";
         ArrayStack2 numStack = new ArrayStack2(10);
         ArrayStack2 operatorStack = new ArrayStack2(10);
         // 用于扫描 expression
         int index = 0;
-        int num1 = 0;
-        int num2 = 0;
-        int operator = 0;
-        int res = 0;
+        int num1;
+        int num2;
+        int operator;
+        int res;
+        // 解决多位数运算
+        StringBuilder keepNum = new StringBuilder();
         // 暂存 expression 的每个字符
         char ch = ' ';
         // 扫描 expression
-        while (true) {
+        do {
             ch = expression.substring(index, index + 1).charAt(0);
             // 判断是不是符号
             if (operatorStack.isOperator(ch)) {
@@ -39,13 +41,21 @@ public class Calculate {
                 }
             } else {
                 // 不是 符号
-                numStack.push(ch - 48);
+                keepNum.append(ch);
+                // 判断 index 是不是最后一位
+                if (index == expression.length() - 1) {
+                    numStack.push(Integer.parseInt(String.valueOf(keepNum)));
+                } else {
+                    // 不能只获取一个字符,如果下一个字 符为运算符, 那就放入竖栈
+                    if (operatorStack.isOperator(expression.substring(index + 1, index + 2).charAt(0))) {
+                        numStack.push(Integer.parseInt(String.valueOf(keepNum)));
+                        // 清空 keepNum
+                        keepNum.delete(0, keepNum.length());
+                    }
+                }
             }
             index++;
-            if (index >= expression.length()) {
-                break;
-            }
-        }
+        } while (index < expression.length());
 
         // 当表达式扫描完毕， 符号栈只剩下符号优先级最低的符号，此时 扫描 符号栈 进行计算
         while (!operatorStack.isEmpty()) {
@@ -100,7 +110,7 @@ class ArrayStack2 {
     /**
      * 查看栈顶数据
      *
-     * @return
+     * @return int
      */
     public int peek() {
         return stack[top];
